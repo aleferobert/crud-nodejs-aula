@@ -1,16 +1,9 @@
 {
-  "name": "app",
+  "name": "NODE-APP",
   "version": "1.0.0",
-  "description": "",
+  "description": "* PORT\r * MONGOURL",
   "main": "index.js",
-  "scripts": {
-    "start": "node index.js"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
-    "@handlebars/allow-prototype-access": "^1.0.5",
     "bcryptjs": "^2.4.3",
     "connect-flash": "^0.1.1",
     "crypto-js": "^4.1.1",
@@ -24,5 +17,20 @@
     "morgan": "^1.10.0",
     "passport": "^0.4.1",
     "passport-local": "^1.0.0"
-  }
+  },
+  "devDependencies": {},
+  "scripts": {
+    "start": "node ./index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/aleferobert/crud-nodejs-aula.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/aleferobert/crud-nodejs-aula/issues"
+  },
+  "homepage": "https://github.com/aleferobert/crud-nodejs-aula#readme"
 }
