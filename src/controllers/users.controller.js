@@ -21,8 +21,8 @@ usersCtrl.signup = async (req, res) => {
     } else {
         const emailUser = await User.findOne({ email });
         if (emailUser) {
-            req.flash('failure_msg', 'E-mail já cadastrado!');
-            res.redirect('/users/signup');
+            erros.push({text:'E-mail já cadastrado!'});
+            res.render('users/signup'),{ erros, name, email };
         } else {
             const newUser = new User({ name, email, password })
             newUser.password = await newUser.hashPassword(password);
