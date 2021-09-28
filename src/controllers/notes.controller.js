@@ -17,7 +17,6 @@ notesCtrl.createNewNode = async (req, res) => {
 
 notesCtrl.renderNotes = async (req, res) => {
     const id_user = new Note({user:req.user.id}).user;
-    const name_user = await User.findById(id_user,{_id: 0, name:1});
     const notes = await Note.aggregate([
         {$match:{user:id_user}},
         {$lookup:{from: "users",localField: "user",foreignField: "_id", as: "createdby"}}
