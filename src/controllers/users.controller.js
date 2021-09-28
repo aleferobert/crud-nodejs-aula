@@ -22,7 +22,7 @@ usersCtrl.signup = async (req, res) => {
         const emailUser = await User.findOne({ email });
         if (emailUser) {
             req.flash('failure_msg', 'E-mail já cadastrado!');
-            res.render('users/signup');
+            res.redirect('/users/login');
         } else {
             const newUser = new User({ name, email, password })
             newUser.password = await newUser.hashPassword(password);
@@ -30,7 +30,7 @@ usersCtrl.signup = async (req, res) => {
             req.flash('success_msg', 'Cadastro realizado com Sucesso!');
             res.render('users/login');
         }
-        res.redirect('/users/login');
+        //
     }
 }
 usersCtrl.renderLoginForm = (req, res) => {
