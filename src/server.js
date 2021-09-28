@@ -5,7 +5,7 @@ const exhbs = require('express-handlebars');
 const { allowInsecurePrototypeAccess } = require('@handlebars/allow-prototype-access');
 
 const morgan = require('morgan');
-const methodOverride = require('method-Override');
+const methodOverride = require('method-override');
 const flash = require('connect-flash');
 const session = require('express-session');
 
