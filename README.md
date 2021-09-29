@@ -6,5 +6,5 @@
 *HOSTMAIL
 *PORTMAIL 
 *USERMAIL 
-*SERVERMAIL= 'NODEAPP <naoresponda@naorespoda.com>'
+*SERVERMAIL
 *PASSMAIL
