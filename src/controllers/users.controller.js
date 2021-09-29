@@ -1,16 +1,17 @@
 const usersCtrl = {};
 
 const passport = require('passport');
+const mail = require('../helpers/mail')
 const User = require('../models/User');
-const nodemailer = require('nodemailer');
-const { text } = require('express');
+const Confirm = require('../models/Confirm')
+
 
 usersCtrl.renderSignUpForm = (req, res) => {
     res.render('users/signup');
 };
 
 usersCtrl.signup = async (req, res) => {
-    const erros = []
+    const erros = [];
     const { name, email, confirm_email, password, confirm_password } = req.body;
     if (password != confirm_password) {
         erros.push({ text: 'Senhas diferentes' });
@@ -25,18 +26,38 @@ usersCtrl.signup = async (req, res) => {
         res.render('users/signup', { erros, name, email });
     } else {
         const emailUser = await User.findOne({ email });
+        const emailNot = await Confirm.findOne({ email });
         if (emailUser) {
             erros.push({ text: 'E-mail já cadastrado!' });
             res.render('users/signup'), { erros, name, email };
-        } else {
-            const newUser = new User({ name, email, password })
-            newUser.password = await newUser.hashPassword(password);
-            /*await newUser.save();
+        }
+        if (emailNot) {
+            erros.push({text:"Email já cadastrado mas não confirmado. Por favor confirme agora para continuar"});
+            res.render('users/confirm', {erros, email })
+        }
+        else {
+            const newUser = new User({ password });
+            /*newUser.password = await newUser.hashPassword(password);
+            await newUser.save();
             req.flash('success_msg', 'Cadastro realizado com Sucesso!');
             res.redirect('/users/login');*/
+            var cod = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
 
-            req.flash('confirm_reg', newUser);
-            res.redirect('/users/confirm_register');
+            const newConfirm = new Confirm({ name, email, password, cod });
+            newConfirm.password = await newUser.hashPassword(password);
+            await newConfirm.save().then(
+
+                mail.sendMail({
+                    from: process.env.SERVERMAIL,
+                    to: email,
+                    subject: "Código de confirmação de cadastrado - NODEAPP",
+                    text: cod.toString()
+                }),
+                res.render('users/confirm', { email })
+
+            ).catch(err => {
+
+            });
         }
     }
 }
@@ -65,27 +86,22 @@ usersCtrl.logout = (req, res) => {
 };
 
 
-usersCtrl.confirm_register = (req, res) => {
-    console.log(req.flash('confirm_reg'));
-    if (req.flash('confirm_reg')) {
-        const transporter = nodemailer.createTransport({
-            host: process.env.HOSTMAIL,
-            port: process.env.PORTMAIL,
-            auth: { user: process.env.USERMAIL, pass: process.env.PASSMAIL }
-        });
+usersCtrl.confirm_register = async (req, res) => {
+    const { email, cod } = req.body;
+    const dados = await Confirm.findOne({ email });
 
-        transporter.sendMail({
-            from: req.body.email,
-            to: req.body.name,
-            replyTo: process.env.SERVEREMAIL,
-            subject: "Código de confirmação de cadastrado - NODEAPP",
-            text: "1234"
-        });
-
-        //res.render()
+    if (cod == dados.cod) {
+        const { name, email, password } = dados;
+        const newUser = new User({ name, email, password });
+        await newUser.save();
+        await Confirm.deleteOne({email});
+        req.flash('success_msg', 'Cadastro realizado com Sucesso!');
+        res.redirect('/users/login');
+    } else {
+        const erros = [];
+        erros.push({text:'Código Inválido'});
+        res.render('users/confirm', { erros,email })
     }
-}
-
-
+};
 
 module.exports = usersCtrl;
