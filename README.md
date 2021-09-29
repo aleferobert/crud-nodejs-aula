@@ -3,3 +3,8 @@
 ## Enviroment Variables
 * PORT
 * MONGOURL
+*HOSTMAIL
+*PORTMAIL 
+*USERMAIL 
+*SERVERMAIL= 'NODEAPP <naoresponda@naorespoda.com>'
+*PASSMAIL
