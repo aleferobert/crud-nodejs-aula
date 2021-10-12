@@ -1,10 +1,10 @@
 const usersCtrl = {};
 
 const passport = require('passport');
-const mail = require('../helpers/mail')
+const mail = require('../helpers/mail');
 const User = require('../models/User');
-const Confirm = require('../models/Confirm')
-
+const Confirm = require('../models/Confirm');
+const neo4j = require('../database');
 
 usersCtrl.renderSignUpForm = (req, res) => {
     res.render('users/signup');
@@ -95,6 +95,7 @@ usersCtrl.confirm_register = async (req, res) => {
         const newUser = new User({ name, email, password });
         await newUser.save();
         await Confirm.deleteOne({email});
+        await neo4j.newUser(name);
         req.flash('success_msg', 'Cadastro realizado com Sucesso!');
         res.redirect('/users/login');
     } else {
@@ -102,6 +103,10 @@ usersCtrl.confirm_register = async (req, res) => {
         erros.push({text:'Código Inválido'});
         res.render('users/confirm', { erros,email })
     }
+};
+
+usersCtrl.addFriend = (req,res) =>{
+
 };
 
 module.exports = usersCtrl;

@@ -22,9 +22,22 @@ const session = driver.session({
 
 console.log("Conetado ao Neo4J");
 
-const neo = async () => {
+
+const newUser = async (name) => {
+    const results = await session.run("CREATE (n: Pessoa{nome:'"+name+"'})",{});
+    console.log(results);
+    session.close();
+};
+
+const newFriend = async (name) =>{
+    const results = await session.run("CREATE (n: Pessoa{nome:'"+name+"'})",{});
+    console.log(results);
+    session.close();
+}
+
+const test = async (nome) => {
     const nodes = []
-    const results = await session.run("MATCH (n: Pessoa) RETURN (n)",{});
+    const results = await session.run("CREATE (n: Pessoa{nome:'"+nome+"'})",{});
     results.records.forEach(res => {
         const properties = res.get(0).properties;
         nodes.push({nome: properties.nome, idade: properties.idade.low })
@@ -33,4 +46,5 @@ const neo = async () => {
     session.close();
 }
 
-neo();
+exports.newUser = newUser;
+exports.newFriend = newFriend;
