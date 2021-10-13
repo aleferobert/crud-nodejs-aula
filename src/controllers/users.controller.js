@@ -105,8 +105,9 @@ usersCtrl.confirm_register = async (req, res) => {
     }
 };
 
-usersCtrl.addFriend = (req,res) =>{
-
+usersCtrl.addFriend = async (req,res) =>{
+    await neo4j.newFriend(req.user.name,req.params.name);
+    res.redirect('/notes');
 };
 
 module.exports = usersCtrl;

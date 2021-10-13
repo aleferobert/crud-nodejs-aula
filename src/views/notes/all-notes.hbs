@@ -7,23 +7,41 @@
                     {{title}} <a href="/notes/edit/{{_id}}"><i class="fa fa-pencil" arial-hidden="true"></i></a>
                 </h4>
                 <p>{{description}}</p>
-                <p style="font-size: small;">Criado por: <a href="" data-toggle="tooltip" data-placement= "oi" title ="<p>Criado em:{{createdAt}}</p><p>Última Modificação: {{updatedAt}}</p>">{{#each createdby}}{{name}}{{/each}}</a></p>
+                <p style="font-size: small;">Criado por: <a href="" data-toggle="tooltip" data-placement="oi"
+                        title="<p>Criado em:{{createdAt}}</p><p>Última Modificação: {{updatedAt}}</p>">{{#each
+                        createdby}}{{name}}{{/each}}</a></p>
                 <form action="/notes/delete/{{_id}}?_method=DELETE" method="POST">
                     <button type="submit" class="btn btn-danger btn-block btn-sm">Delete</button>
                 </form>
             </div>
         </div>
     </div>
-    {{/each}}
-    <div class="menu ml-auto">
-        <div class="icon-close">
-            <h1>X</h1>
-        </div>
-        <!-- Menu -->
-        <ul>
-            <li>
-                <a href="#">Menu 1</a>
-            </li>
-        </ul>
+</div>
+{{/each}}
+<div class="card menu ml-auto">
+    <div class="icon-close">
+        <p>Todos os usuários</p>
     </div>
+    <!-- Menu -->
+    {{#each users }}
+    <ul>
+        <li>
+            <a href="#">{{nome}}</a>
+            <a href="/users/addFriend/{{nome}}"></a>
+        </li>
+    </ul>
+    {{/each}}
+</div>
+<div class="card menu ml-auto">
+    <div class="icon-close">
+        <p>Amigos</p>
+    </div>
+    <!-- Menu -->
+    {{#each friends }}
+    <ul>
+        <li>
+            <a href="#">{{nome}}</a>
+        </li>
+    </ul>
+    {{/each}}
 </div>

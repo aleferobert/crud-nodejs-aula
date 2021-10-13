@@ -1,5 +1,6 @@
 const notesCtrl = {};
 const Note = require('../models/Notes');
+const neo4j = require('../database');
 
 notesCtrl.renderNoteForm = (req, res) => {
     res.render('notes/new-notes');
@@ -20,8 +21,11 @@ notesCtrl.renderNotes = async (req, res) => {
         {$match:{user:id_user}},
         {$lookup:{from: "users",localField: "user",foreignField: "_id", as: "createdby"}}
     ]);
-
-    res.render('notes/all-notes', {notes});
+    const users = await neo4j.users();
+    const friends =  await neo4j.allFriends(req.user.name);
+    console.log(req.user.name);
+    console.log(friends);
+    res.render('notes/all-notes', {notes, users, friends});
 };
 
 notesCtrl.renderEditForm = async (req, res) => {
