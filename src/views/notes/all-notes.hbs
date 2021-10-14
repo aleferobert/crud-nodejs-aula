@@ -18,30 +18,45 @@
     </div>
 </div>
 {{/each}}
-<div class="card menu ml-auto">
+<div class="card menu ml-auto col-md-3">
     <div class="icon-close">
         <p>Todos os usuários</p>
     </div>
     <!-- Menu -->
     {{#each users }}
-    <ul>
-        <li>
-            <a href="#">{{nome}}</a>
-            <a href="/users/addFriend/{{nome}}"></a>
+    <ul class="list-group list-group-flush">
+        <li "list-group-item">
+            <a href="/users/user/{{nome}}">{{nome}}</a>
+            <form action="/users/addFriend/{{nome}}" method="POST">
+                    <button type="submit" class="btn btn-primary btn-sm">Adicionar</button>
+            </form>
         </li>
     </ul>
     {{/each}}
 </div>
-<div class="card menu ml-auto">
+<div class="card menu ml-auto col-md-3">
     <div class="icon-close">
         <p>Amigos</p>
     </div>
     <!-- Menu -->
     {{#each friends }}
-    <ul>
-        <li>
-            <a href="#">{{nome}}</a>
+    <ul class="list-group list-group-flush">
+        <li "list-group-item">
+            {{nome}}
+            <form action="/users/addFriend/{{nome}}?_method=DELETE" method="POST">
+                    <button type="submit" class="btn btn-danger btn-block btn-sm">Delete</button>
+            </form>
         </li>
     </ul>
     {{/each}}
 </div>
+
+       <ul class="dropdown-menu scrollable-menu" role="menu">
+          <li><a href="#">Action</a></li>
+          <li><a href="#">Another action</a></li>
+          <li><a href="#">Something else here</a></li>
+          <li><a href="#">Action</a></li>
+            ..
+          <li><a href="#">Action</a></li>
+          <li><a href="#">Another action</a></li>
+       </ul>

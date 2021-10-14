@@ -53,6 +53,7 @@ usersCtrl.signup = async (req, res) => {
                     subject: "Código de confirmação de cadastrado - NODEAPP",
                     text: cod.toString()
                 }),
+                console.log("O código de confirmação é:", cod.toString()),
                 res.render('users/confirm', { email })
 
             ).catch(err => {
@@ -108,6 +109,17 @@ usersCtrl.confirm_register = async (req, res) => {
 usersCtrl.addFriend = async (req,res) =>{
     await neo4j.newFriend(req.user.name,req.params.name);
     res.redirect('/notes');
+};
+
+usersCtrl.removeFriend = async (req,res) =>{
+    await neo4j.removeFriend(req.user.name,req.params.name);
+    res.redirect('/notes');
+};
+
+usersCtrl.userPage = async (req,res) =>{
+    const friends = await neo4j.allFriends(req.params.name);
+    console.log(friends);
+    res.render('users/user',{friends});
 };
 
 module.exports = usersCtrl;

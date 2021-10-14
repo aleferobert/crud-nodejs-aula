@@ -1,7 +1,7 @@
 const { Router } = require('express');
 const router = Router();
 
-//const { isAuthenticated } = require('../helpers/auth');
+const { isAuthenticated } = require('../helpers/auth');
 
 const { renderSignUpForm, 
     signup, 
@@ -9,7 +9,9 @@ const { renderSignUpForm,
     login, 
     logout,
     confirm_register,
-    addFriend} = require('../controllers/users.controller')
+    addFriend,
+    removeFriend,
+    userPage} = require('../controllers/users.controller')
 
 router.get('/users/signup', renderSignUpForm);
 router.post('/users/signup', signup);
@@ -21,6 +23,8 @@ router.get('/users/logout', logout);
 
 router.post('/users/confirm_register',confirm_register);
 
-//router.get('/users/addFriend/:name',isAuthenticated, addFriend);
+router.get('/users/user/:name', isAuthenticated, userPage)
+router.post('/users/addFriend/:name',isAuthenticated, addFriend);
+router.delete('/users/addFriend/:name',isAuthenticated, removeFriend);
 
 module.exports = router;

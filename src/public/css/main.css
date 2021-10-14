@@ -1,3 +1,9 @@
 .logo{
     width: 40%;
 }
+
+.scrollable-menu {
+    height: auto;
+    max-height: 200px;
+    overflow-x: hidden;
+}

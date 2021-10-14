@@ -29,8 +29,13 @@ const newUser = async (name) => {
 
 const newFriend = async (name,name2) =>{
     const session = driver.session({database: database});
-    const results = await session.run("CREATE (: Pessoa{nome:'"+name+"'}) - [AMIGO_DE] -> (u2:Pessoa{nome:'"+name2+"') - [AMIGO_DE] -> (u2)",{});
-    console.log(results);
+    const results = await session.run("MATCH (u:Pessoa{nome:'"+name+"'}),(u2:Pessoa{nome:'"+name2+"'}) WHERE NOT (u)- [:AMIGO_DE]->(u2) AND NOT u = u2 CREATE (u) - [:AMIGO_DE] -> (u2)",{});
+    session.close();
+}
+
+const removeFriend = async (name,name2) =>{
+    const session = driver.session({database: database});
+    const results = await session.run("MATCH (u:Pessoa{nome:'"+name+"'}) - [r:AMIGO_DE] ->(u2:Pessoa{nome:'"+name2+"'}) DELETE (r)",{});
     session.close();
 }
 
@@ -46,10 +51,10 @@ const allFriends = async (name) =>{
     return (nodes);
 }
 
-const users = async () => {
+const users = async (name) => {
     const nodes = []
     const session = driver.session({database: database});
-    const results = await session.run("MATCH (n: Pessoa) RETURN n",{});
+    const results = await session.run("MATCH (n: Pessoa) WHERE NOT n = '"+name+"' RETURN n",{});
     results.records.forEach(res => {
         const properties = res.get(0).properties;
         nodes.push({nome: properties.nome })
@@ -60,5 +65,6 @@ const users = async () => {
 
 exports.newUser = newUser;
 exports.newFriend = newFriend;
+exports.removeFriend = removeFriend;
 exports.allFriends = allFriends;
 exports.users = users;

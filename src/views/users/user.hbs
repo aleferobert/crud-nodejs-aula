@@ -1,0 +1,13 @@
+<div class="card menu ml-auto">
+    <div class="icon-close">
+        <p>Amigos</p>
+    </div>
+    <!-- Menu -->
+    {{#each friends}}
+    <ul>
+        <li>
+            <a href="/users/user/{{nome}}">{{nome}}</a>
+        </li>
+    </ul>
+    {{/each}}
+</div>
