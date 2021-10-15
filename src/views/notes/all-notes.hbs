@@ -1,3 +1,13 @@
+{{#each user}}<img src="{{avatar}}" alt="">
+<form ref='uploadForm' id='uploadForm' action="/users/user/avatar/{{nome}}" method="POST" encType="multipart/form-data">
+    <input type="file" name="avatar"><br>
+    <button type="submit" class="btn btn-danger btn-block btn-sm">Alterar Foto</button>
+</form>
+<form action="/users/user/avatar/{{nome}}?_method=DELETE" method="POST">
+                    <button type="submit" class="btn btn-danger btn-block btn-sm">Delete</button>
+                </form>
+{{/each}}
+
 <div class="row">
     {{#each notes}}
     <div class="col-md-3">
@@ -27,8 +37,9 @@
     <ul class="list-group list-group-flush">
         <li "list-group-item">
             <a href="/users/user/{{nome}}">{{nome}}</a>
+            <img src="{{avatar}}" alt="">
             <form action="/users/addFriend/{{nome}}" method="POST">
-                    <button type="submit" class="btn btn-primary btn-sm">Adicionar</button>
+                <button type="submit" class="btn btn-primary btn-sm">Adicionar</button>
             </form>
         </li>
     </ul>
@@ -44,19 +55,9 @@
         <li "list-group-item">
             {{nome}}
             <form action="/users/addFriend/{{nome}}?_method=DELETE" method="POST">
-                    <button type="submit" class="btn btn-danger btn-block btn-sm">Delete</button>
+                <button type="submit" class="btn btn-danger btn-block btn-sm">Delete</button>
             </form>
         </li>
     </ul>
     {{/each}}
 </div>
-
-       <ul class="dropdown-menu scrollable-menu" role="menu">
-          <li><a href="#">Action</a></li>
-          <li><a href="#">Another action</a></li>
-          <li><a href="#">Something else here</a></li>
-          <li><a href="#">Action</a></li>
-            ..
-          <li><a href="#">Action</a></li>
-          <li><a href="#">Another action</a></li>
-       </ul>

@@ -8,6 +8,7 @@ const morgan = require('morgan');
 const methodOverride = require('method-override');
 const flash = require('connect-flash');
 const session = require('express-session');
+const fileUpload = require('express-fileupload');
 
 const passport = require('passport');
 
@@ -39,6 +40,11 @@ app.use(session({
 app.use(flash());
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(fileUpload({
+    limits: { fileSize: 2 * 1024 * 1024 },
+    safeFileNames: true,
+    
+    }));
 
 //Global Variables
 app.use((req, res, next) => {

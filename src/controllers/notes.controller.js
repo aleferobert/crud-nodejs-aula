@@ -21,9 +21,11 @@ notesCtrl.renderNotes = async (req, res) => {
         {$match:{user:id_user}},
         {$lookup:{from: "users",localField: "user",foreignField: "_id", as: "createdby"}}
     ]);
-    const users = await neo4j.users(req.user.name);
-    const friends =  await neo4j.allFriends(req.user.name);
-    res.render('notes/all-notes', {notes, users, friends});
+    const users = await neo4j.users(req.user.email);
+    const friends =  await neo4j.allFriends(req.user.email);
+    const user = await neo4j.user(req.user.email);
+    
+    res.render('notes/all-notes', {notes, users, friends, user});
 };
 
 notesCtrl.renderEditForm = async (req, res) => {

@@ -32,8 +32,8 @@ usersCtrl.signup = async (req, res) => {
             res.render('users/signup'), { erros, name, email };
         }
         if (emailNot) {
-            erros.push({text:"Email já cadastrado mas não confirmado. Por favor confirme agora para continuar"});
-            res.render('users/confirm', {erros, email })
+            erros.push({ text: "Email já cadastrado mas não confirmado. Por favor confirme agora para continuar" });
+            res.render('users/confirm', { erros, email })
         }
         else {
             const newUser = new User({ password });
@@ -95,31 +95,54 @@ usersCtrl.confirm_register = async (req, res) => {
         const { name, email, password } = dados;
         const newUser = new User({ name, email, password });
         await newUser.save();
-        await Confirm.deleteOne({email});
-        await neo4j.newUser(name);
+        await Confirm.deleteOne({ email });
+        await neo4j.newUser(name, email);
         req.flash('success_msg', 'Cadastro realizado com Sucesso!');
         res.redirect('/users/login');
     } else {
         const erros = [];
-        erros.push({text:'Código Inválido'});
-        res.render('users/confirm', { erros,email })
+        erros.push({ text: 'Código Inválido' });
+        res.render('users/confirm', { erros, email })
     }
 };
 
-usersCtrl.addFriend = async (req,res) =>{
-    await neo4j.newFriend(req.user.name,req.params.name);
+usersCtrl.addFriend = async (req, res) => {
+    await neo4j.newFriend(req.user.email, req.params.name);
     res.redirect('/notes');
 };
 
-usersCtrl.removeFriend = async (req,res) =>{
-    await neo4j.removeFriend(req.user.name,req.params.name);
+usersCtrl.removeFriend = async (req, res) => {
+    await neo4j.removeFriend(req.user.email, req.params.name);
     res.redirect('/notes');
 };
 
-usersCtrl.userPage = async (req,res) =>{
+usersCtrl.userPage = async (req, res) => {
     const friends = await neo4j.allFriends(req.params.name);
     console.log(friends);
-    res.render('users/user',{friends});
+    res.render('users/user', { friends });
 };
+
+usersCtrl.altAvatar = async (req, res) => {
+    const path = require('path');
+
+    const mime = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!req.files || !mime.includes(req.files.avatar.mimetype)) {
+        req.flash('failure_msg', 'Insira uma imagem jpeg, jpg ou png de no máximo 2 MB');
+        return res.redirect('/notes');
+    }
+
+    var avatar = req.files.avatar;
+    avatar.mv(path.join(__dirname + '/../public/img/avatar/') + req.user.id).then(
+        await neo4j.attAvatar(req.user.email, req.user.id),
+        req.flash('sucess_msg', 'Imagem enviada com sucesso!')
+    ).catch( err => req.flash('failure_msg', 'Erro no upload!' + err));
+    res.redirect('/notes');
+};
+
+usersCtrl.removeAvatar = async (req,res) => {
+    await neo4j.attAvatar(req.user.email, req.user.id, true),
+    req.flash('sucess_msg', 'Imagem removida com sucesso!')
+    res.redirect('/notes');
+}
 
 module.exports = usersCtrl;

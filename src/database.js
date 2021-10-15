@@ -19,30 +19,35 @@ const driver = new neo4j.driver("neo4j://localhost:7687", neo4j.auth.basic("neo4
 const database = "neo4j";
 
 console.log("Conetado ao Neo4J");
-
-const newUser = async (name) => {
+//CRIA USUARIO
+const newUser = async (name, email) => {
     const session = driver.session({database: database});
-    const results = await session.run("CREATE (n: Pessoa{nome:'"+name+"'})",{});
+    const results = await session.run("CREATE (n: Pessoa{nome:'"+name+"',avatar:'/img/avatar/avatar.jpeg', email:'"+email+"'})",{});
     console.log(results);
     session.close();
 };
-
-const newFriend = async (name,name2) =>{
+//ADICIONA AMIGO
+const newFriend = async (email,name2) =>{
     const session = driver.session({database: database});
-    const results = await session.run("MATCH (u:Pessoa{nome:'"+name+"'}),(u2:Pessoa{nome:'"+name2+"'}) WHERE NOT (u)- [:AMIGO_DE]->(u2) AND NOT u = u2 CREATE (u) - [:AMIGO_DE] -> (u2)",{});
+    const results = await session.run("MATCH (u:Pessoa{email:'"+email+"'}),(u2:Pessoa{nome:'"+name2+"'}) WHERE NOT (u)- [:AMIGO_DE]->(u2) AND NOT u = u2 CREATE (u) - [:AMIGO_DE] -> (u2)",{});
     session.close();
 }
-
+//REMOVE AMIGO
 const removeFriend = async (name,name2) =>{
     const session = driver.session({database: database});
-    const results = await session.run("MATCH (u:Pessoa{nome:'"+name+"'}) - [r:AMIGO_DE] ->(u2:Pessoa{nome:'"+name2+"'}) DELETE (r)",{});
+    const results = await session.run("MATCH (u:Pessoa{email:'"+email+"'}) - [r:AMIGO_DE] ->(u2:Pessoa{nome:'"+name2+"'}) DELETE (r)",{});
     session.close();
 }
-
-const allFriends = async (name) =>{
+//VER TODOS OS AMIGOS
+const allFriends = async (email,name) =>{
     const nodes = []
     const session = driver.session({database: database});
-    const results = await session.run("MATCH (:Pessoa{nome:'"+name+"'})-[AMIGO_DE]->(n:Pessoa) RETURN n",{});
+    const results = []
+    if(!name) {
+    results = await session.run("MATCH (:Pessoa{email:'"+email+"'})-[AMIGO_DE]->(n:Pessoa) RETURN n",{});
+    } else {
+    results = await session.run("MATCH (:Pessoa{nome:'"+name+"'})-[AMIGO_DE]->(n:Pessoa) RETURN n",{});
+    }
     results.records.forEach(res => {
         const properties = res.get(0).properties;
         nodes.push({nome: properties.nome })
@@ -50,17 +55,40 @@ const allFriends = async (name) =>{
     session.close();
     return (nodes);
 }
-
-const users = async (name) => {
+//VER TODOS OS USUARIOS
+const users = async (email) => {
     const nodes = []
     const session = driver.session({database: database});
-    const results = await session.run("MATCH (n: Pessoa) WHERE NOT n = '"+name+"' RETURN n",{});
+    const results = await session.run("MATCH (n: Pessoa) WHERE NOT n.email ='"+email+"' RETURN n",{});
     results.records.forEach(res => {
         const properties = res.get(0).properties;
-        nodes.push({nome: properties.nome })
+        nodes.push({nome: properties.nome , avatar: properties.avatar})
     });
     session.close();
     return (nodes);
+}
+
+const user = async (email) => {
+    const nodes = []
+    const session = driver.session({database: database});
+    const results = await session.run("MATCH (n: Pessoa{email:'"+email+"'}) RETURN n",{});
+    results.records.forEach(res => {
+        const properties = res.get(0).properties;
+        nodes.push({nome: properties.nome, avatar: properties.avatar })
+    });
+    session.close();
+    return (nodes);
+}
+
+const attAvatar = async(email,id, remove) =>{
+    const session = driver.session({database: database});
+    if(remove == false){
+        const results = await session.run("MATCH (n:Pessoa{email:'"+email+"'}) SET n.avatar ='/img/avatar/"+id+"' RETURN n.avatar",{});
+        session.close();
+    } else {
+        const results = await session.run("MATCH (n:Pessoa{email:'"+email+"'}) SET n.avatar ='/img/avatar/avatar.jpeg' RETURN n.avatar",{});
+    }
+    
 }
 
 exports.newUser = newUser;
@@ -68,3 +96,5 @@ exports.newFriend = newFriend;
 exports.removeFriend = removeFriend;
 exports.allFriends = allFriends;
 exports.users = users;
+exports.user = user;
+exports.attAvatar = attAvatar;
