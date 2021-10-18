@@ -5,6 +5,7 @@ const mail = require('../helpers/mail');
 const User = require('../models/User');
 const Confirm = require('../models/Confirm');
 const neo4j = require('../database');
+const path = require('path');
 
 usersCtrl.renderSignUpForm = (req, res) => {
     res.render('users/signup');
@@ -13,6 +14,14 @@ usersCtrl.renderSignUpForm = (req, res) => {
 usersCtrl.signup = async (req, res) => {
     const erros = [];
     const { name, email, confirm_email, password, confirm_password } = req.body;
+
+
+
+    const mime = ['image/jpeg', 'image/jpg', 'image/png'];
+    if (!req.files || !mime.includes(req.files.avatar.mimetype)) {
+        erros.push({ text: 'Insira uma imagem jpeg, jpg ou png de no máximo 2 MB' });
+    };
+
     if (password != confirm_password) {
         erros.push({ text: 'Senhas diferentes' });
     };
@@ -41,6 +50,14 @@ usersCtrl.signup = async (req, res) => {
             await newUser.save();
             req.flash('success_msg', 'Cadastro realizado com Sucesso!');
             res.redirect('/users/login');*/
+
+            var avatar = req.files.avatar;
+            avatar.mv(path.join(__dirname + '/../public/img/avatar/') + req.user.id).then(
+                await neo4j.attAvatar(req.user.email, req.user.id),
+                req.flash('sucess_msg', 'Imagem enviada com sucesso!')
+            ).catch( err => req.flash('failure_msg', 'Erro no upload!' + err));
+            res.redirect('/notes');
+
             var cod = Math.floor(Math.random() * (99999 - 10000 + 1)) + 10000;
 
             const newConfirm = new Confirm({ name, email, password, cod });
@@ -117,14 +134,16 @@ usersCtrl.removeFriend = async (req, res) => {
 };
 
 usersCtrl.userPage = async (req, res) => {
-    const friends = await neo4j.allFriends(req.params.name);
-    console.log(friends);
-    res.render('users/user', { friends });
+    const id = await User.findOne({Name:req.params.name});
+
+    const friends = await neo4j.allFriends([], req.params.name);
+
+    const user = await neo4j.user(id.email);
+console.log(id.email);
+    res.render('users/user', { friends, user });
 };
 
 usersCtrl.altAvatar = async (req, res) => {
-    const path = require('path');
-
     const mime = ['image/jpeg', 'image/jpg', 'image/png'];
     if (!req.files || !mime.includes(req.files.avatar.mimetype)) {
         req.flash('failure_msg', 'Insira uma imagem jpeg, jpg ou png de no máximo 2 MB');
@@ -135,13 +154,13 @@ usersCtrl.altAvatar = async (req, res) => {
     avatar.mv(path.join(__dirname + '/../public/img/avatar/') + req.user.id).then(
         await neo4j.attAvatar(req.user.email, req.user.id),
         req.flash('sucess_msg', 'Imagem enviada com sucesso!')
-    ).catch( err => req.flash('failure_msg', 'Erro no upload!' + err));
+    ).catch(err => req.flash('failure_msg', 'Erro no upload!' + err));
     res.redirect('/notes');
 };
 
-usersCtrl.removeAvatar = async (req,res) => {
+usersCtrl.removeAvatar = async (req, res) => {
     await neo4j.attAvatar(req.user.email, req.user.id, true),
-    req.flash('sucess_msg', 'Imagem removida com sucesso!')
+        req.flash('sucess_msg', 'Imagem removida com sucesso!')
     res.redirect('/notes');
 }
 

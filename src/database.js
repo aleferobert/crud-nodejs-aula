@@ -33,7 +33,7 @@ const newFriend = async (email,name2) =>{
     session.close();
 }
 //REMOVE AMIGO
-const removeFriend = async (name,name2) =>{
+const removeFriend = async (email,name2) =>{
     const session = driver.session({database: database});
     const results = await session.run("MATCH (u:Pessoa{email:'"+email+"'}) - [r:AMIGO_DE] ->(u2:Pessoa{nome:'"+name2+"'}) DELETE (r)",{});
     session.close();
@@ -42,12 +42,13 @@ const removeFriend = async (name,name2) =>{
 const allFriends = async (email,name) =>{
     const nodes = []
     const session = driver.session({database: database});
-    const results = []
+    var resultsq;
     if(!name) {
-    results = await session.run("MATCH (:Pessoa{email:'"+email+"'})-[AMIGO_DE]->(n:Pessoa) RETURN n",{});
+    resultsq = "MATCH (:Pessoa{email:'"+email+"'})-[AMIGO_DE]->(n:Pessoa) RETURN n"
     } else {
-    results = await session.run("MATCH (:Pessoa{nome:'"+name+"'})-[AMIGO_DE]->(n:Pessoa) RETURN n",{});
+    resultsq = "MATCH (:Pessoa{nome:'"+name+"'})-[AMIGO_DE]->(n:Pessoa) RETURN n"
     }
+    const results = await session.run(resultsq,{});
     results.records.forEach(res => {
         const properties = res.get(0).properties;
         nodes.push({nome: properties.nome })
@@ -82,13 +83,13 @@ const user = async (email) => {
 
 const attAvatar = async(email,id, remove) =>{
     const session = driver.session({database: database});
-    if(remove == false){
+    if(!remove ){
         const results = await session.run("MATCH (n:Pessoa{email:'"+email+"'}) SET n.avatar ='/img/avatar/"+id+"' RETURN n.avatar",{});
-        session.close();
+       
     } else {
         const results = await session.run("MATCH (n:Pessoa{email:'"+email+"'}) SET n.avatar ='/img/avatar/avatar.jpeg' RETURN n.avatar",{});
     }
-    
+     session.close();
 }
 
 exports.newUser = newUser;
