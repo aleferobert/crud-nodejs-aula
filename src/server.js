@@ -63,4 +63,10 @@ app.use(require('./routes/users.routes'));
 //Static Files
 app.use(express.static(path.join(__dirname, 'public')));
 
+//404 Page
+app.use((req,res)=>{
+    res.status(404).render('404');
+});
+
+
 module.exports = app;
